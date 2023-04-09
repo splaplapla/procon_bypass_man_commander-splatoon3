@@ -46,3 +46,11 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## TODO
+* 解像度を上げると検出率と負荷はどう変化するのか？
+  * 少なくとも解析対象の画像は小さい方が負荷は低い
+  * 解像度のパターン
+      * 低: 640x360
+      * 中: 1280x720
+      * 高: 1920x1080
