@@ -2,12 +2,19 @@ PATH
   remote: .
   specs:
     procon_bypass_man_commander-splatoon3 (0.1.0)
+      ropencv
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.5.0)
+    ffi (1.15.5)
     rake (13.0.6)
+    rbind (0.0.35)
+      ffi (~> 1.9, >= 1.9.0)
+    ropencv (0.0.38)
+      ffi (>= 1.9.0)
+      rbind (>= 0.0.35)
     rspec (3.11.0)
       rspec-core (~> 3.11.0)
       rspec-expectations (~> 3.11.0)

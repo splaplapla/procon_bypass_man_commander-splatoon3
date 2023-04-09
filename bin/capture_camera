@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require 'ropencv'
+include OpenCV
+
+video_file = cv::VideoCapture.new(0)
+frame = cv::Mat.new
+
+puts "writing a single image"
+if video_file.read(frame)
+    cv::imwrite "captured_image.png", frame
+end
