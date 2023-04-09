@@ -49,10 +49,14 @@ module ProconBypassManCommander
 
         # 画面中央のみ検査する
         width = gray_image.cols
-        middle_start = (2 * width / 5).floor
-        middle_end = (3 * width / 5).floor
-        cropped_gray_image = gray_image.col_range(middle_start, middle_end)
-        # OpenCV::cv::imwrite('hoge.png', cropped_gray_image) # debug
+        width_middle_start = (width / 7* 3).floor # 5分割
+        width_middle_end = (width / 7 * 4).floor
+        height = gray_image.rows
+        height_middle_start = (height / 3).floor # 3分割
+        height_middle_end = (2 * height / 3).floor
+        cutted_cropped_gray_image = gray_image.col_range(width_middle_start, width_middle_end)
+        cropped_gray_image = cutted_cropped_gray_image.row_range(height_middle_start, height_middle_end)
+        OpenCV::cv::imwrite('hoge.png', cropped_gray_image) # debug
 
         result_cols = cropped_gray_image.cols - gray_template.cols + 1
         result_rows = cropped_gray_image.rows - gray_template.rows + 1
@@ -60,11 +64,9 @@ module ProconBypassManCommander
         match_method = OpenCV::cv::TM_CCOEFF_NORMED
         OpenCV::cv::match_template(cropped_gray_image, gray_template, result, match_method)
 
-        # NOTE: 判定結果をマーキング
         min_location = OpenCV::cv::Point.new
         max_location = OpenCV::cv::Point.new
         min_val, max_val = OpenCV::cv::min_max_loc(result, min_location, max_location)
-
         if (match_method == OpenCV::cv::TM_SQDIFF || match_method == OpenCV::cv::TM_SQDIFF_NORMED) && min_val <= THRESHOLD
           match_location = min_location
         elsif max_val >= THRESHOLD
@@ -73,16 +75,18 @@ module ProconBypassManCommander
           return nil
         end
 
-        # debug
-        match_location.x += middle_start # 正しい位置でマーキングするために検査対象を絞り込んだ部分を足す
+        # NOTE: 判定結果をマーキング
+        match_location.x += width_middle_start # 正しい位置でマーキングするために検査対象を絞り込んだ部分を足す
+        match_location.y += height_middle_start
         OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + template.cols, match_location.y + template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
         result_image_path = "#{target_path}-result.png"
         OpenCV::cv::imwrite(result_image_path, image)
 
 
         # second_templateとのテンプレートマッチングを実行
-        first_match_location = match_location
-        first_matched_and_cropped_gray_image = cropped_gray_image.row_range(match_location.y - 10, match_location.y + 30)
+        first_match_location = match_location.dup
+        # first_matched_and_cropped_gray_image = cropped_gray_image.row_range(first_match_location.y - 10, first_match_location.y + 30)
+        first_matched_and_cropped_gray_image = cropped_gray_image
         # OpenCV::cv::imwrite('hoge.png', first_matched_and_cropped_gray_image) # debug
 
         result_cols = first_matched_and_cropped_gray_image.cols - gray_second_template.cols + 1
