@@ -1,9 +1,10 @@
 require "procon_bypass_man_commander/splatoon3/version"
 
+
 module ProconBypassManCommander
   module Splatoon3
     class TemplateMatcher
-      THRESHOLD = 0.3
+      THRESHOLD = 0.4
 
       # よくある前処理の実装例
       # image = OpenCV::cv::imread(target_path, OpenCV::cv::IMREAD_COLOR)
@@ -31,23 +32,27 @@ module ProconBypassManCommander
       # OpenCV::cv::match_template(edges_image, edges_template, result, match_method)
 
 
-      def self.match(target_path:, )
+      def self.match(target_path:)
         first_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-up-sd.png'
+        second_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-down-sd.png'
 
         image = OpenCV::cv::imread(target_path, OpenCV::cv::IMREAD_COLOR)
         template = OpenCV::cv::imread(first_template_path, OpenCV::cv::IMREAD_COLOR)
+        second_template = OpenCV::cv::imread(second_template_path, OpenCV::cv::IMREAD_COLOR)
 
         gray_image = OpenCV::cv::Mat.new
         gray_template = OpenCV::cv::Mat.new
+        gray_second_template = OpenCV::cv::Mat.new
         OpenCV::cv::cvtColor(image, gray_image, OpenCV::cv::COLOR_BGR2GRAY)
         OpenCV::cv::cvtColor(template, gray_template, OpenCV::cv::COLOR_BGR2GRAY)
+        OpenCV::cv::cvtColor(second_template, gray_second_template, OpenCV::cv::COLOR_BGR2GRAY)
 
         # 画面中央のみ検査する
         width = gray_image.cols
         middle_start = (2 * width / 5).floor
         middle_end = (3 * width / 5).floor
         cropped_gray_image = gray_image.col_range(middle_start, middle_end)
-        OpenCV::cv::imwrite('hoge.png', cropped_gray_image)
+        # OpenCV::cv::imwrite('hoge.png', cropped_gray_image) # debug
 
         result_cols = cropped_gray_image.cols - gray_template.cols + 1
         result_rows = cropped_gray_image.rows - gray_template.rows + 1
@@ -55,25 +60,54 @@ module ProconBypassManCommander
         match_method = OpenCV::cv::TM_CCOEFF_NORMED
         OpenCV::cv::match_template(cropped_gray_image, gray_template, result, match_method)
 
-
         # NOTE: 判定結果をマーキング
-        min_loc = OpenCV::cv::Point.new
-        max_loc = OpenCV::cv::Point.new
-        min_val, max_val = OpenCV::cv::min_max_loc(result, min_loc, max_loc)
+        min_location = OpenCV::cv::Point.new
+        max_location = OpenCV::cv::Point.new
+        min_val, max_val = OpenCV::cv::min_max_loc(result, min_location, max_location)
 
         if (match_method == OpenCV::cv::TM_SQDIFF || match_method == OpenCV::cv::TM_SQDIFF_NORMED) && min_val <= THRESHOLD
-          match_loc = min_loc
+          match_location = min_location
         elsif max_val >= THRESHOLD
-          match_loc = max_loc
+          match_location = max_location
         else
           return nil
         end
 
-        match_loc.x += middle_start
-        OpenCV::cv::rectangle(image, match_loc, OpenCV::cv::Point.new(match_loc.x + template.cols, match_loc.y + template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
-
+        # debug
+        match_location.x += middle_start # 正しい位置でマーキングするために検査対象を絞り込んだ部分を足す
+        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + template.cols, match_location.y + template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
         result_image_path = "#{target_path}-result.png"
         OpenCV::cv::imwrite(result_image_path, image)
+
+
+        # second_templateとのテンプレートマッチングを実行
+        first_match_location = match_location
+        first_matched_and_cropped_gray_image = cropped_gray_image.row_range(match_location.y - 10, match_location.y + 30)
+        # OpenCV::cv::imwrite('hoge.png', first_matched_and_cropped_gray_image) # debug
+
+        result_cols = first_matched_and_cropped_gray_image.cols - gray_second_template.cols + 1
+        result_rows = first_matched_and_cropped_gray_image.rows - gray_second_template.rows + 1
+        result = OpenCV::cv::Mat.new(result_rows, result_cols, OpenCV::cv::CV_32FC1)
+        OpenCV::cv::match_template(first_matched_and_cropped_gray_image, gray_second_template, result, match_method)
+
+        min_location = OpenCV::cv::Point.new
+        max_location = OpenCV::cv::Point.new
+        min_val, max_val = OpenCV::cv::min_max_loc(result, min_location, max_location)
+
+        if (match_method == OpenCV::cv::TM_SQDIFF || match_method == OpenCV::cv::TM_SQDIFF_NORMED) && min_val <= THRESHOLD
+          match_location = min_location
+        elsif max_val >= THRESHOLD
+          match_location = max_location
+        else
+          return nil
+        end
+
+        match_location.x += first_match_location.x # - 60
+        match_location.y += first_match_location.y
+        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + second_template.cols, match_location.y + second_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
+        result_image_path = "#{target_path}-result.png"
+        OpenCV::cv::imwrite(result_image_path, image)
+
       end
     end
   end

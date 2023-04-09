@@ -1,4 +1,7 @@
 RSpec.describe ProconBypassManCommander::Splatoon3 do
+  before(:all) do
+    `rm ./spec/files/*-result*.png`
+  end
   def take_realtime(name)
     time =  Benchmark.realtime { yield }
     puts "#{name}: #{time}"
@@ -30,13 +33,13 @@ RSpec.describe ProconBypassManCommander::Splatoon3 do
   end
 
   it do
-    ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/invisible-target1-sd.png')
-    ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/invisible-target2-sd.png')
-
     ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/shoorter-visible-target1-sd.png')
     ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/shoorter-visible-target2-sd.png')
     ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/shoorter-visible-target3-sd.png')
     ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/shoorter-visible-target4-sd.png')
+
+    ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/invisible-target1-sd.png')
+    ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/invisible-target2-sd.png')
 
   end
 end
