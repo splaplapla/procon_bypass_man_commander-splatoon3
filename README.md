@@ -1,10 +1,19 @@
 # ProconBypassManCommander::Splatoon3
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/procon_bypass_man_commander/splatoon3`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+* template matching
+* This gem is used by https://github.com/splaplapla/procon_bypass_man_commander
 
 ## Installation
+require opencv!!!!!
+
+```
+brew install opencv@3 cmake python3
+ln -s "$(which python3)" /usr/local/bin/python
+export LDFLAGS="-L/opt/homebrew/opt/opencv@3/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/opencv@3/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/opencv@3/lib/pkgconfig"
+gem i ropencv
+```
 
 Add this line to your application's Gemfile:
 
