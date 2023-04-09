@@ -8,5 +8,8 @@ frame = cv::Mat.new
 
 puts "writing a single image"
 if video_file.read(frame)
-    cv::imwrite "captured_image.png", frame
+  new_width = 320
+  new_height = 240
+  cv::resize(frame, frame, cv::Size.new(new_width, new_height))
+  cv::imwrite "captured_image.png", frame
 end
