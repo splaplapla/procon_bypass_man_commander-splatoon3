@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "procon_bypass_man_commander/splatoon3"
+require "pry"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
