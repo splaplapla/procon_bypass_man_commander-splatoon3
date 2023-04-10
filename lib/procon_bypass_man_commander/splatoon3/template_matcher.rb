@@ -77,7 +77,7 @@ module ProconBypassManCommander
         match_location.x += width_middle_start
         match_location.y += height_middle_start
         OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + template.cols, match_location.y + template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
-        OpenCV::cv::imwrite("#{target_path}-result.png", image)
+        # OpenCV::cv::imwrite("#{target_path}-result.png", image)
 
         first_match_location = match_location.dup
 
