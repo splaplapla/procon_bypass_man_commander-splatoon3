@@ -11,25 +11,17 @@ module ProconBypassManCommander
         end
       end
 
-      def self.match(target_path:, debug: false)
-        # クラス変数にキャッシュする
-        first_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-up-sd.png'
-        second_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-down-sd.png'
-        third_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-left-sd.png'
-
+      def self.match(target_path:, debug: false, first_template: , second_template: )
         image = OpenCV::cv::imread(target_path, OpenCV::cv::IMREAD_COLOR)
-        template = OpenCV::cv::imread(first_template_path, OpenCV::cv::IMREAD_COLOR)
-        second_template = OpenCV::cv::imread(second_template_path, OpenCV::cv::IMREAD_COLOR)
-        third_template = OpenCV::cv::imread(third_template_path, OpenCV::cv::IMREAD_COLOR)
 
         gray_image = OpenCV::cv::Mat.new
         gray_template = OpenCV::cv::Mat.new
         gray_second_template = OpenCV::cv::Mat.new
         gray_third_template = OpenCV::cv::Mat.new
         OpenCV::cv::cvtColor(image, gray_image, OpenCV::cv::COLOR_BGR2GRAY)
-        OpenCV::cv::cvtColor(template, gray_template, OpenCV::cv::COLOR_BGR2GRAY)
+        OpenCV::cv::cvtColor(first_template, gray_template, OpenCV::cv::COLOR_BGR2GRAY)
         OpenCV::cv::cvtColor(second_template, gray_second_template, OpenCV::cv::COLOR_BGR2GRAY)
-        OpenCV::cv::cvtColor(third_template, gray_third_template, OpenCV::cv::COLOR_BGR2GRAY)
+        # OpenCV::cv::cvtColor(third_template, gray_third_template, OpenCV::cv::COLOR_BGR2GRAY)
 
         # テンプレートマッチングの対象範囲を限定する
         width = gray_image.cols
@@ -64,9 +56,8 @@ module ProconBypassManCommander
         # 画面中央で切り取った部分のオフセットを加える
         match_location.x += width_middle_start
         match_location.y += height_middle_start
-        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + template.cols, match_location.y + template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
+        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + first_template.cols, match_location.y + first_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0) if debug
 
-        first_match_location = match_location.dup
 
         # 2回目のマッチング
         result_cols = cropped_gray_image.cols - gray_second_template.cols + 1
@@ -90,7 +81,7 @@ module ProconBypassManCommander
 
         match_location.x += width_middle_start
         match_location.y += height_middle_start
-        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + second_template.cols, match_location.y + second_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
+        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + second_template.cols, match_location.y + second_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0) if debug
         if debug
           OpenCV::cv::imwrite("#{target_path.gsub('.png', '')}-result.png", image)
         end
