@@ -1,14 +1,13 @@
 module ProconBypassManCommander
   module Splatoon3
     class TemplateMatcher
-      THRESHOLD = 0.4
-
       class Positon
-        attr_accessor :x, :y
+        attr_accessor :x, :y, :correlation_value
 
-        def initialize(x, y)
+        def initialize(x, y, correlation_value)
           @x = x
           @y = y
+          @correlation_value = correlation_value
         end
       end
 
@@ -46,13 +45,12 @@ module ProconBypassManCommander
         min_location = OpenCV::cv::Point.new
         max_location = OpenCV::cv::Point.new
         min_val, max_val = OpenCV::cv::min_max_loc(result, min_location, max_location)
-
-        if (match_method == OpenCV::cv::TM_SQDIFF || match_method == OpenCV::cv::TM_SQDIFF_NORMED) && min_val <= THRESHOLD
+        if match_method == OpenCV::cv::TM_SQDIFF || match_method == OpenCV::cv::TM_SQDIFF_NORMED
+          first_matching_correlation_value = min_val
           match_location = min_location
-        elsif max_val >= THRESHOLD
-          match_location = max_location
         else
-          return nil
+          first_matching_correlation_value = max_val
+          match_location = max_location
         end
 
         first_matching_x = match_location.x
@@ -72,13 +70,12 @@ module ProconBypassManCommander
         min_location = OpenCV::cv::Point.new
         max_location = OpenCV::cv::Point.new
         min_val, max_val = OpenCV::cv::min_max_loc(result, min_location, max_location)
-
-        if (match_method == OpenCV::cv::TM_SQDIFF || match_method == OpenCV::cv::TM_SQDIFF_NORMED) && min_val <= THRESHOLD
+        if match_method == OpenCV::cv::TM_SQDIFF || match_method == OpenCV::cv::TM_SQDIFF_NORMED
+          second_match_correlation_value = min_val
           match_location = min_location
-        elsif max_val >= THRESHOLD
-          match_location = max_location
         else
-          return nil
+          second_match_correlation_value = max_val
+          match_location = max_location
         end
 
         second_matching_x = match_location.x
@@ -91,7 +88,7 @@ module ProconBypassManCommander
           OpenCV::cv::imwrite("#{target_path.gsub('.png', '')}-result.png", image)
         end
 
-        return [Positon.new(first_matching_x, first_matching_y), Positon.new(second_matching_x, second_matching_y)]
+        return [Positon.new(first_matching_x, first_matching_y, first_matching_correlation_value), Positon.new(second_matching_x, second_matching_y, second_match_correlation_value)]
       end
     end
   end

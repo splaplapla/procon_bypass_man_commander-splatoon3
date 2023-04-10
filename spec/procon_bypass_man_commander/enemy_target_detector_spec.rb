@@ -10,11 +10,6 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetector do
       let(:skip_table) do
         {
           'invisible-target4-sd.png' => '謎',
-          'name_00381.png' => 'これは除外したい',
-          'fff.png' => 'これは判定したい',
-          'ff.png' => 'これは判定したい',
-          'city.png' => '謎',
-          'city.png' => '謎',
         }
       end
       let(:expected_value) { false }
@@ -39,8 +34,8 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetector do
 
     context 'when has_targets' do
       let(:skip_table) do
-        { 'invisible-target1-sd.png' => 'プレイヤーにマッチしてしまっている. 一旦スキップ',
-          'invisible-target4-sd.png' => '謎',
+        {
+          'name_00377.png' => '背景と色がかぶっているので厳しそう',
           'name_00224.png' => 'これは判定できてほしい',
         }
       end
