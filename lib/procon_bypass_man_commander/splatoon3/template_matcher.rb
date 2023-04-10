@@ -35,22 +35,17 @@ module ProconBypassManCommander
         cropped_gray_image = cutted_cropped_gray_image.row_range(height_middle_start, height_middle_end)
 
         # 1回目のマッチング
-        result_cols = cropped_gray_image.cols - gray_template.cols + 1
-        result_rows = cropped_gray_image.rows - gray_template.rows + 1
-        matching_result = OpenCV::cv::Mat.new(result_rows, result_cols, OpenCV::cv::CV_32FC1)
-        OpenCV::cv::match_template(cropped_gray_image, gray_template, matching_result, match_method)
+        matching_result = do_matching(cropped_gray_image, gray_template)
         first_matching_correlation_value, match_location = calc_location(matching_result)
         first_matching_x = match_location.x
         first_matching_y = match_location.y
         match_location.x += width_middle_start
         match_location.y += height_middle_start
+
         OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + first_template.cols, match_location.y + first_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0) if debug
 
         # 2回目のマッチング
-        result_cols = cropped_gray_image.cols - gray_second_template.cols + 1
-        result_rows = cropped_gray_image.rows - gray_second_template.rows + 1
-        matching_result = OpenCV::cv::Mat.new(result_rows, result_cols, OpenCV::cv::CV_32FC1)
-        OpenCV::cv::match_template(cropped_gray_image, gray_second_template, matching_result, match_method)
+        matching_result = do_matching(cropped_gray_image, gray_second_template)
         second_match_correlation_value, match_location = calc_location(matching_result)
         second_matching_x = match_location.x
         second_matching_y = match_location.y
@@ -71,6 +66,13 @@ module ProconBypassManCommander
         ]
       end
 
+      def self.do_matching(target_image, template)
+        result_cols = target_image.cols - template.cols + 1
+        result_rows = target_image.rows - template.rows + 1
+        matching_result = OpenCV::cv::Mat.new(result_rows, result_cols, OpenCV::cv::CV_32FC1)
+        OpenCV::cv::match_template(target_image, template, matching_result, match_method)
+        matching_result
+      end
 
       def self.calc_location(result)
         min_location = OpenCV::cv::Point.new
