@@ -11,6 +11,7 @@ module ProconBypassManCommander
         end
       end
 
+      # TODO: 3つでマッチングをする。3つのうち、2つが想定した範囲内の座標になっていれば、OKとする
       def self.match(target_path:, debug: false, first_template: , second_template: )
         image = OpenCV::cv::imread(target_path, OpenCV::cv::IMREAD_COLOR)
 
