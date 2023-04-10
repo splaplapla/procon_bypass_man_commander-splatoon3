@@ -6,7 +6,7 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetector do
   end
 
   describe 'detect?' do
-    context 'no_targets' do
+    context 'when no_targets' do
       let(:skip_table) do
         {
           'invisible-target4-sd.png' => '謎',
@@ -28,7 +28,7 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetector do
             skip reason
           end
 
-          actual = described_class.detect?(path)
+          actual = described_class.detect?(path, debug: false)
           if expected_value != actual
             described_class.detect?(path, debug: true)
           end
@@ -37,7 +37,7 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetector do
       end
     end
 
-    context 'has_targets' do
+    context 'when has_targets' do
       let(:skip_table) do
         { 'invisible-target1-sd.png' => 'プレイヤーにマッチしてしまっている. 一旦スキップ',
           'invisible-target4-sd.png' => '謎',
@@ -55,9 +55,6 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetector do
           end
 
           actual = described_class.detect?(path, debug: true)
-          if expected_value != actual
-            described_class.detect?(path, debug: true)
-          end
           expect(actual).to eq(expected_value)
         end
       end
