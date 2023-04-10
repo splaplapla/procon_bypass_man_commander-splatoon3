@@ -11,6 +11,9 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetector do
         {
           'invisible-target4-sd.png' => '謎',
           'name_00381.png' => 'これは除外したい',
+          'fff.png' => 'これは判定したい',
+          'ff.png' => 'これは判定したい',
+          'city.png' => '謎',
           'city.png' => '謎',
         }
       end
