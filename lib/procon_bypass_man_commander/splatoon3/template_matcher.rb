@@ -1,7 +1,7 @@
 module ProconBypassManCommander
   module Splatoon3
     class TemplateMatcher
-      class Positon
+      class MatchingResult
         attr_accessor :x, :y, :correlation_value
 
         def initialize(x, y, correlation_value)
@@ -12,19 +12,24 @@ module ProconBypassManCommander
       end
 
       def self.match(target_path:, debug: false)
+        # クラス変数にキャッシュする
         first_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-up-sd.png'
         second_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-down-sd.png'
+        third_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-left-sd.png'
 
         image = OpenCV::cv::imread(target_path, OpenCV::cv::IMREAD_COLOR)
         template = OpenCV::cv::imread(first_template_path, OpenCV::cv::IMREAD_COLOR)
         second_template = OpenCV::cv::imread(second_template_path, OpenCV::cv::IMREAD_COLOR)
+        third_template = OpenCV::cv::imread(third_template_path, OpenCV::cv::IMREAD_COLOR)
 
         gray_image = OpenCV::cv::Mat.new
         gray_template = OpenCV::cv::Mat.new
         gray_second_template = OpenCV::cv::Mat.new
+        gray_third_template = OpenCV::cv::Mat.new
         OpenCV::cv::cvtColor(image, gray_image, OpenCV::cv::COLOR_BGR2GRAY)
         OpenCV::cv::cvtColor(template, gray_template, OpenCV::cv::COLOR_BGR2GRAY)
         OpenCV::cv::cvtColor(second_template, gray_second_template, OpenCV::cv::COLOR_BGR2GRAY)
+        OpenCV::cv::cvtColor(third_template, gray_third_template, OpenCV::cv::COLOR_BGR2GRAY)
 
         # テンプレートマッチングの対象範囲を限定する
         width = gray_image.cols
@@ -36,6 +41,7 @@ module ProconBypassManCommander
         cutted_cropped_gray_image = gray_image.col_range(width_middle_start, width_middle_end)
         cropped_gray_image = cutted_cropped_gray_image.row_range(height_middle_start, height_middle_end)
 
+        # 1回目のマッチング
         result_cols = cropped_gray_image.cols - gray_template.cols + 1
         result_rows = cropped_gray_image.rows - gray_template.rows + 1
         result = OpenCV::cv::Mat.new(result_rows, result_cols, OpenCV::cv::CV_32FC1)
@@ -62,6 +68,7 @@ module ProconBypassManCommander
 
         first_match_location = match_location.dup
 
+        # 2回目のマッチング
         result_cols = cropped_gray_image.cols - gray_second_template.cols + 1
         result_rows = cropped_gray_image.rows - gray_second_template.rows + 1
         result = OpenCV::cv::Mat.new(result_rows, result_cols, OpenCV::cv::CV_32FC1)
@@ -88,7 +95,13 @@ module ProconBypassManCommander
           OpenCV::cv::imwrite("#{target_path.gsub('.png', '')}-result.png", image)
         end
 
-        return [Positon.new(first_matching_x, first_matching_y, first_matching_correlation_value), Positon.new(second_matching_x, second_matching_y, second_match_correlation_value)]
+        # 3回目のマッチング
+        # TODO: 実装する
+
+        return [
+          MatchingResult.new(first_matching_x, first_matching_y, first_matching_correlation_value),
+          MatchingResult.new(second_matching_x, second_matching_y, second_match_correlation_value),
+        ]
       end
     end
   end
