@@ -8,7 +8,7 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetector do
   describe 'detect?' do
     context 'no_targets' do
       let(:skip_table) do
-        { 'invisible-target1-sd.png' => 'プレイヤーにマッチしてしまっている. 一旦スキップ',
+        {
           'invisible-target4-sd.png' => '謎',
           'city.png' => '謎',
         }

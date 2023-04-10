@@ -3,6 +3,15 @@ module ProconBypassManCommander
     class TemplateMatcher
       THRESHOLD = 0.4
 
+      class Positon
+        attr_accessor :x, :y
+
+        def initialize(x, y)
+          @x = x
+          @y = y
+        end
+      end
+
       def self.match(target_path:, debug: false)
         first_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-up-sd.png'
         second_template_path = './lib/procon_bypass_man_commander/splatoon3/assets/template-down-sd.png'
@@ -43,9 +52,11 @@ module ProconBypassManCommander
         elsif max_val >= THRESHOLD
           match_location = max_location
         else
-          return false
+          return nil
         end
 
+        first_matching_x = match_location.x
+        first_matching_y = match_location.y
         # 画面中央で切り取った部分のオフセットを加える
         match_location.x += width_middle_start
         match_location.y += height_middle_start
@@ -67,18 +78,20 @@ module ProconBypassManCommander
         elsif max_val >= THRESHOLD
           match_location = max_location
         else
-          return false
+          return nil
         end
 
-        first_matching_x = match_location.x
-        first_matching_y = match_location.y
+        second_matching_x = match_location.x
+        second_matching_y = match_location.y
+
         match_location.x += width_middle_start
         match_location.y += height_middle_start
         OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + second_template.cols, match_location.y + second_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
         if debug
           OpenCV::cv::imwrite("#{target_path.gsub('.png', '')}-result.png", image)
         end
-        return true
+
+        return [Positon.new(first_matching_x, first_matching_y), Positon.new(second_matching_x, second_matching_y)]
       end
     end
   end
