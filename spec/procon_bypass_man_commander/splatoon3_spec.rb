@@ -19,6 +19,7 @@ RSpec.describe ProconBypassManCommander::Splatoon3 do
       ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/invisible-target2-sd.png')
     end
       ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/invisible-target3-sd.png')
+      ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/invisible-target4-sd.png')
     take_realtime '3' do
       ProconBypassManCommander::Splatoon3::TemplateMatcher.match(target_path: './spec/files/shoorter-visible-target1-sd.png')
     end

@@ -9,4 +9,4 @@
 
 # rspec failure tracking
 .rspec_status
-/spec/files/*-result*.png
+/spec/files/**/*-result*.png
