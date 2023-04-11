@@ -1,7 +1,7 @@
 module ProconBypassManCommander
   module Splatoon3
     class TemplateMatcher
-      class MatchingResult
+      class MatchedResult
         attr_accessor :x, :y, :correlation_value
 
         def initialize(x, y, correlation_value)
@@ -12,17 +12,19 @@ module ProconBypassManCommander
       end
 
       # TODO: 3つでマッチングをする。3つのうち、2つが想定した範囲内の座標になっていれば、OKとする
-      def self.match(target_path:, debug: false, first_template: , second_template: )
+      def self.match(target_path:, debug: false, first_template: , second_template: , third_template: , fourth_template: )
         image = OpenCV::cv::imread(target_path, OpenCV::cv::IMREAD_COLOR)
 
         gray_image = OpenCV::cv::Mat.new
         gray_template = OpenCV::cv::Mat.new
         gray_second_template = OpenCV::cv::Mat.new
         gray_third_template = OpenCV::cv::Mat.new
+        gray_fourth_template = OpenCV::cv::Mat.new
         OpenCV::cv::cvtColor(image, gray_image, OpenCV::cv::COLOR_BGR2GRAY)
         OpenCV::cv::cvtColor(first_template, gray_template, OpenCV::cv::COLOR_BGR2GRAY)
         OpenCV::cv::cvtColor(second_template, gray_second_template, OpenCV::cv::COLOR_BGR2GRAY)
-        # OpenCV::cv::cvtColor(third_template, gray_third_template, OpenCV::cv::COLOR_BGR2GRAY)
+        OpenCV::cv::cvtColor(third_template, gray_third_template, OpenCV::cv::COLOR_BGR2GRAY)
+        OpenCV::cv::cvtColor(fourth_template, gray_fourth_template, OpenCV::cv::COLOR_BGR2GRAY)
 
         # テンプレートマッチングの対象範囲を限定する
         width = gray_image.cols
@@ -41,7 +43,6 @@ module ProconBypassManCommander
         first_matching_y = match_location.y
         match_location.x += width_middle_start
         match_location.y += height_middle_start
-
         OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + first_template.cols, match_location.y + first_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0) if debug
 
         # 2回目のマッチング
@@ -51,18 +52,35 @@ module ProconBypassManCommander
         second_matching_y = match_location.y
         match_location.x += width_middle_start
         match_location.y += height_middle_start
+        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + second_template.cols, match_location.y + second_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0) if debug
+
+        # 3回目のマッチング
+        matching_result = do_matching(cropped_gray_image, gray_third_template)
+        third_match_correlation_value, match_location = calc_location(matching_result)
+        third_matching_x = match_location.x
+        third_matching_y = match_location.y
+        match_location.x += width_middle_start
+        match_location.y += height_middle_start
+        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + third_template.cols, match_location.y + third_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0) if debug
+
+        # 4回目のマッチング
+        matching_result = do_matching(cropped_gray_image, gray_fourth_template)
+        fourth_match_correlation_value, match_location = calc_location(matching_result)
+        fourth_matching_x = match_location.x
+        fourth_matching_y = match_location.y
+        match_location.x += width_middle_start
+        match_location.y += height_middle_start
+        OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + third_template.cols, match_location.y + fourth_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0) if debug
 
         if debug
-          OpenCV::cv::rectangle(image, match_location, OpenCV::cv::Point.new(match_location.x + second_template.cols, match_location.y + second_template.rows), OpenCV::cv::Scalar.new(0, 255, 0), 2, 8, 0)
           OpenCV::cv::imwrite("#{target_path.gsub('.png', '')}-result.png", image)
         end
 
-        # 3回目のマッチング
-        # TODO: 実装する
-
         return [
-          MatchingResult.new(first_matching_x, first_matching_y, first_matching_correlation_value),
-          MatchingResult.new(second_matching_x, second_matching_y, second_match_correlation_value),
+          MatchedResult.new(first_matching_x, first_matching_y, first_matching_correlation_value),
+          MatchedResult.new(second_matching_x, second_matching_y, second_match_correlation_value),
+          MatchedResult.new(third_matching_x, third_matching_y, third_match_correlation_value),
+          MatchedResult.new(fourth_matching_x, fourth_matching_y, fourth_match_correlation_value),
         ]
       end
 
