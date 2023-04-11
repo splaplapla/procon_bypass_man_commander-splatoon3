@@ -40,8 +40,12 @@ module ProconBypassManCommander
       # TODO: 3つでマッチングをする。3つのうち、2つが想定した範囲内の座標になっていれば、OKとする
       def self.match(target_path:, debug: false, first_template: , second_template: nil, third_template: nil, fourth_template: nil, negative_template: nil)
         @results = []
+        if target_path.is_a?(String)
+          image = OpenCV::cv::imread(target_path, OpenCV::cv::IMREAD_COLOR)
+        else
+          image = target_path
+        end
 
-        image = OpenCV::cv::imread(target_path, OpenCV::cv::IMREAD_COLOR)
         gray_image = OpenCV::cv::Mat.new
         gray_negative_template = OpenCV::cv::Mat.new
         OpenCV::cv::cvtColor(image, gray_image, OpenCV::cv::COLOR_BGR2GRAY)

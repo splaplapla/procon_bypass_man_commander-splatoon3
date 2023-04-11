@@ -1,14 +1,12 @@
 module ProconBypassManCommander
   module Splatoon3
     class EnemyTargetDetectorHDLiter
-      FIRST_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/liter/template-up.png'
-      SECOND_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/liter/template-down.png'
-
-      NEGATIVE_CENTER_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/liter/template-negative-center.png'
+      FIRST_TEMPLATE_PATH = File.join(__dir__, 'assets', 'hd', 'liter', 'template-up.png')
+      SECOND_TEMPLATE_PATH = File.join(__dir__, 'assets', 'hd', 'liter', 'template-down.png')
+      NEGATIVE_CENTER_TEMPLATE_PATH = File.join(__dir__, 'assets', 'hd', 'liter', 'template-negative-center.png')
 
       @@first_template = OpenCV::cv::imread(FIRST_TEMPLATE_PATH, OpenCV::cv::IMREAD_COLOR)
       @@second_template = OpenCV::cv::imread(SECOND_TEMPLATE_PATH, OpenCV::cv::IMREAD_COLOR)
-
       @@negative_center_template = OpenCV::cv::imread(NEGATIVE_CENTER_TEMPLATE_PATH, OpenCV::cv::IMREAD_COLOR)
 
       # @return [Boolean]
