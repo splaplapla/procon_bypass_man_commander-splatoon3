@@ -2,11 +2,11 @@ module ProconBypassManCommander
   module Splatoon3
     # TODO: shooter用なのでリネームする
     class EnemyTargetDetectorHD
-      FIRST_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/template-up.png'
-      SECOND_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/template-down.png'
+      FIRST_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/shooter/template-up.png'
+      SECOND_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/shooter/template-down.png'
 
-      CENTER_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/template-center.png'
-      NEGATIVE_CENTER_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/template-negative-center.png'
+      CENTER_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/shooter/template-center.png'
+      NEGATIVE_CENTER_TEMPLATE_PATH = './lib/procon_bypass_man_commander/splatoon3/assets/hd/shooter/template-negative-center.png'
 
       @@first_template = OpenCV::cv::imread(FIRST_TEMPLATE_PATH, OpenCV::cv::IMREAD_COLOR)
       @@second_template = OpenCV::cv::imread(SECOND_TEMPLATE_PATH, OpenCV::cv::IMREAD_COLOR)
