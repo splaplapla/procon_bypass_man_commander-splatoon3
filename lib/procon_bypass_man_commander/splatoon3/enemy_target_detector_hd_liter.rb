@@ -13,7 +13,7 @@ module ProconBypassManCommander
 
       # @return [Boolean]
       def self.detect?(target_path, debug: false, mode: :part_matching)
-        threshold = 0.7
+        threshold = 0.6
         matched_up_result, matched_down_result = ProconBypassManCommander::Splatoon3::TemplateMatcher.match(
           target_path: target_path,
           debug: debug,
