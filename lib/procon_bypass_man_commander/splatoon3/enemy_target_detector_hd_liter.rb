@@ -12,7 +12,7 @@ module ProconBypassManCommander
       # @return [Boolean]
       def self.detect?(target_path, debug: false, mode: :part_matching)
         threshold = 0.6
-        matched_up_result, matched_down_result = ProconBypassManCommander::Splatoon3::TemplateMatcher.match(
+        matched_up_result, matched_down_result, negative_matched_result = ProconBypassManCommander::Splatoon3::TemplateMatcher.match(
           target_path: target_path,
           debug: debug,
           first_template: @@first_template,
@@ -21,16 +21,25 @@ module ProconBypassManCommander
         )
         return false if matched_up_result.nil?
 
-        # 上下
-        result = within_threshold(matched_up_result.x, matched_down_result.x, 5) &&
+        if matched_up_result.y == matched_down_result.y
+          return false
+        end
+
+        # 上下が近すぎるとだめ
+        if matched_down_result.y - matched_up_result.y <= 9
+          return false
+        end
+
+        result = within_threshold(matched_up_result.x, matched_down_result.x, 3) &&
           within_threshold(matched_up_result.y, matched_down_result.y, 20) &&
           (matched_up_result.correlation_value > threshold || matched_down_result.correlation_value > threshold)
-        # # 左と上
-        # result = result || within_threshold(matched_up_result.x, matched_left_result.x, 5) &&
-        #   (matched_up_result.correlation_value > threshold || matched_down_result.correlation_value > threshold)
-        # # 左と下
-        # result = result || within_threshold(matched_down_result.x, matched_left_result.x, 5) &&
-        #   (matched_up_result.correlation_value > threshold || matched_down_result.correlation_value > threshold)
+
+        # upとネガティブマークのX座標は近いはずなので、乖離しているとだめ
+        result = result && within_threshold(matched_up_result.x, negative_matched_result.x, 5) &&
+          within_threshold(matched_up_result.x, negative_matched_result.x, 5)
+        # upとネガティブマークのY座標は近いはずなので、乖離しているとだめ
+        result = result && within_threshold(matched_down_result.y, negative_matched_result.y, 20) &&
+          within_threshold(matched_down_result.y, negative_matched_result.y, 20)
 
         yield(result, [matched_up_result, matched_down_result]) if block_given? # NOTE: for debug
         return result

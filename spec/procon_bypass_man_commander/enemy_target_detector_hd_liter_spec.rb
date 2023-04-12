@@ -38,6 +38,7 @@ RSpec.describe ProconBypassManCommander::Splatoon3::EnemyTargetDetectorHDLiter d
     context 'when has targets' do
       let(:ignore_table) do
         {
+          'n.png' => 'これはしょうがない',
         }
       end
       let(:expected_value) { true }

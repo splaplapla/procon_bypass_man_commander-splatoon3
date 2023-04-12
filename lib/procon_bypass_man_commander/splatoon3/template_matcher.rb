@@ -11,6 +11,9 @@ module ProconBypassManCommander
         end
       end
 
+      class NegativeMatchedResult < MatchedResult; end
+
+
       class CroppedImage
         def initialize(image)
           @image = image
@@ -64,6 +67,8 @@ module ProconBypassManCommander
             puts "ネガティブテンプレートと相関が高い(#{negative_matching_correlation_value})"
             return nil
           end
+
+          negative_matched_result = NegativeMatchedResult.new(match_location.x, match_location.y, negative_matching_correlation_value)
         end
 
         if second_template.nil?
@@ -128,6 +133,7 @@ module ProconBypassManCommander
           OpenCV::cv::imwrite("#{target_path.gsub('.png', '')}-result.png", image)
         end
 
+        @results << negative_matched_result
         return @results
       end
 
